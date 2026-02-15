@@ -19,6 +19,8 @@ const el = {
   sortBy: document.getElementById('sortBy'),
   clearAllBtn: document.getElementById('clearAllBtn'),
   themeToggle: document.getElementById('themeToggle'),
+  exportCsvBtn: document.getElementById('exportCsvBtn'),
+
 };
 
 const yearEl = document.getElementById('year');
@@ -219,3 +221,48 @@ el.clearAllBtn.addEventListener('click', () => {
   render(subs);
   resetForm();
 });
+function toCsvRow(values) {
+  // CSV safe: wrap in quotes and escape quotes
+  return values.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+}
+
+function downloadCsv(filename, csvText) {
+  const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  URL.revokeObjectURL(url);
+}
+
+function exportSubscriptionsToCsv(subs) {
+  const header = toCsvRow(['Name', 'Category', 'MonthlyPriceTRY', 'CreatedAt']);
+  const rows = subs.map(s =>
+    toCsvRow([
+      s.name,
+      s.category,
+      s.price,
+      new Date(s.createdAt).toISOString(),
+    ])
+  );
+  return [header, ...rows].join('\n');
+}
+
+if (el.exportCsvBtn) {
+  el.exportCsvBtn.addEventListener('click', () => {
+    if (!subs || subs.length === 0) {
+      alert('Dışa aktarılacak veri yok.');
+      return;
+    }
+
+    const csv = exportSubscriptionsToCsv(subs);
+    const stamp = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    downloadCsv(`subscriptions-${stamp}.csv`, csv);
+  });
+}
+
