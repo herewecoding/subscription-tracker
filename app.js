@@ -3,8 +3,22 @@
 const STORAGE_KEY = 'herewecoding_subscriptions_v1';
 const THEME_KEY = 'herewecoding_theme_v1';
 
+const SERVICE_PRESETS = {
+  netflix:   { label: 'Netflix', icon: '🎬', category: 'Streaming', name: 'Netflix' },
+  spotify:   { label: 'Spotify', icon: '🎵', category: 'Müzik',     name: 'Spotify' },
+  youtube:   { label: 'YouTube Premium', icon: '▶️', category: 'Streaming', name: 'YouTube Premium' },
+  disney:    { label: 'Disney+', icon: '✨', category: 'Streaming', name: 'Disney+' },
+  prime:     { label: 'Prime Video', icon: '📺', category: 'Streaming', name: 'Prime Video' },
+  icloud:    { label: 'iCloud+', icon: '☁️', category: 'Bulut',     name: 'iCloud+' },
+  googleone: { label: 'Google One', icon: '🗄️', category: 'Bulut',  name: 'Google One' },
+  chatgpt:   { label: 'ChatGPT', icon: '🤖', category: 'Üretkenlik', name: 'ChatGPT' },
+  github:    { label: 'GitHub', icon: '🧩', category: 'Üretkenlik', name: 'GitHub' },
+  other:     { label: 'Diğer', icon: '🧾', category: 'Diğer',       name: '' },
+};
+
 const el = {
   form: document.getElementById('subForm'),
+  service: document.getElementById('service'),
   name: document.getElementById('name'),
   price: document.getElementById('price'),
   category: document.getElementById('category'),
@@ -18,9 +32,8 @@ const el = {
   filterCategory: document.getElementById('filterCategory'),
   sortBy: document.getElementById('sortBy'),
   clearAllBtn: document.getElementById('clearAllBtn'),
-  themeToggle: document.getElementById('themeToggle'),
   exportCsvBtn: document.getElementById('exportCsvBtn'),
-
+  themeToggle: document.getElementById('themeToggle'),
 };
 
 const yearEl = document.getElementById('year');
@@ -29,25 +42,16 @@ if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 /* =========================
    Theme
    ========================= */
-
 function setTheme(theme) {
   const t = theme === 'light' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', t);
   localStorage.setItem(THEME_KEY, t);
-
-  if (el.themeToggle) {
-    el.themeToggle.textContent = t === 'light' ? '☀️ Light' : '🌙 Dark';
-  }
+  if (el.themeToggle) el.themeToggle.textContent = t === 'light' ? '☀️ Light' : '🌙 Dark';
 }
 
 function initTheme() {
   const saved = localStorage.getItem(THEME_KEY);
-  if (saved === 'light' || saved === 'dark') {
-    setTheme(saved);
-    return;
-  }
-  // Default: dark (since UI is designed around it)
-  setTheme('dark');
+  setTheme(saved === 'light' || saved === 'dark' ? saved : 'dark');
 }
 
 initTheme();
@@ -60,9 +64,8 @@ if (el.themeToggle) {
 }
 
 /* =========================
-   Subscriptions
+   Storage
    ========================= */
-
 function loadSubs() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -77,6 +80,9 @@ function saveSubs(subs) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(subs));
 }
 
+/* =========================
+   Utils
+   ========================= */
 function formatTRY(value) {
   const n = Number(value);
   if (!Number.isFinite(n)) return '₺0.00';
@@ -91,16 +97,32 @@ function sanitizeName(name) {
   return String(name).trim().replace(/\s+/g, ' ');
 }
 
+function getPreset(serviceKey) {
+  return SERVICE_PRESETS[serviceKey] || null;
+}
+
+/* =========================
+   Form
+   ========================= */
 function getFormData() {
+  const serviceKey = el.service?.value || '';
   const name = sanitizeName(el.name.value);
   const price = Number(el.price.value);
   const category = el.category.value;
+
+  const preset = getPreset(serviceKey);
 
   if (name.length < 2) throw new Error('Ad en az 2 karakter olmalı.');
   if (!Number.isFinite(price) || price < 0) throw new Error('Ücret geçerli olmalı.');
   if (!category) throw new Error('Kategori seçmelisin.');
 
-  return { name, price, category };
+  return {
+    name,
+    price,
+    category,
+    serviceKey: serviceKey || 'other',
+    icon: preset?.icon || '🧾',
+  };
 }
 
 function setEditMode(on, id = '') {
@@ -116,6 +138,23 @@ function resetForm() {
   el.name.focus();
 }
 
+if (el.service) {
+  el.service.addEventListener('change', () => {
+    const preset = getPreset(el.service.value);
+    if (!preset) return;
+
+    // Only autofill if not currently editing
+    if (el.editId.value) return;
+
+    if (preset.name) el.name.value = preset.name;
+    if (preset.category) el.category.value = preset.category;
+    el.name.focus();
+  });
+}
+
+/* =========================
+   List logic
+   ========================= */
 function applyFilterAndSort(subs) {
   const filter = el.filterCategory.value;
   let out = subs.slice();
@@ -136,9 +175,12 @@ function render(subs) {
 
   el.list.innerHTML = visible.map(s => `
     <li class="item" data-id="${s.id}">
-      <div>
-        <strong>${s.name}</strong><br/>
-        <span class="badge">${s.category}</span>
+      <div class="titleWrap">
+        <div class="serviceIcon" title="${s.serviceKey || 'other'}">${s.icon || '🧾'}</div>
+        <div>
+          <strong>${s.name}</strong><br/>
+          <span class="badge">${s.category}</span>
+        </div>
       </div>
       <div class="muted">Aylık</div>
       <div><strong>${formatTRY(s.price)}</strong></div>
@@ -156,11 +198,15 @@ function render(subs) {
   el.yearlyTotal.textContent = formatTRY(monthly * 12);
 
   el.clearAllBtn.disabled = subs.length === 0;
+  if (el.exportCsvBtn) el.exportCsvBtn.disabled = subs.length === 0;
 }
 
 let subs = loadSubs();
 render(subs);
 
+/* =========================
+   Events
+   ========================= */
 el.form.addEventListener('submit', (e) => {
   e.preventDefault();
   try {
@@ -192,6 +238,7 @@ el.list.addEventListener('click', (e) => {
   if (!sub) return;
 
   if (e.target.classList.contains('edit')) {
+    el.service.value = sub.serviceKey || 'other';
     el.name.value = sub.name;
     el.price.value = sub.price;
     el.category.value = sub.category;
@@ -221,8 +268,11 @@ el.clearAllBtn.addEventListener('click', () => {
   render(subs);
   resetForm();
 });
+
+/* =========================
+   CSV Export
+   ========================= */
 function toCsvRow(values) {
-  // CSV safe: wrap in quotes and escape quotes
   return values.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
 }
 
@@ -241,11 +291,12 @@ function downloadCsv(filename, csvText) {
 }
 
 function exportSubscriptionsToCsv(subs) {
-  const header = toCsvRow(['Name', 'Category', 'MonthlyPriceTRY', 'CreatedAt']);
+  const header = toCsvRow(['Name', 'Category', 'ServiceKey', 'MonthlyPriceTRY', 'CreatedAt']);
   const rows = subs.map(s =>
     toCsvRow([
       s.name,
       s.category,
+      s.serviceKey || 'other',
       s.price,
       new Date(s.createdAt).toISOString(),
     ])
@@ -261,8 +312,7 @@ if (el.exportCsvBtn) {
     }
 
     const csv = exportSubscriptionsToCsv(subs);
-    const stamp = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    const stamp = new Date().toISOString().slice(0, 10);
     downloadCsv(`subscriptions-${stamp}.csv`, csv);
   });
 }
-

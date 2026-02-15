@@ -18,9 +18,7 @@
       </div>
 
       <div class="headerRight">
-        <button id="themeToggle" class="ghost" type="button" aria-label="Temayı değiştir">
-          🌙 Dark
-        </button>
+        <button id="themeToggle" class="ghost" type="button" aria-label="Temayı değiştir">🌙 Dark</button>
         <span class="pill">herewecoding</span>
       </div>
     </header>
@@ -29,6 +27,39 @@
       <h2>Abonelik Ekle</h2>
 
       <form id="subForm" class="form">
+        <div class="row">
+          <label>
+            Servis
+            <select id="service">
+              <option value="">(Opsiyonel) Seç</option>
+              <option value="netflix">Netflix</option>
+              <option value="spotify">Spotify</option>
+              <option value="youtube">YouTube Premium</option>
+              <option value="disney">Disney+</option>
+              <option value="prime">Prime Video</option>
+              <option value="icloud">iCloud+</option>
+              <option value="googleone">Google One</option>
+              <option value="chatgpt">ChatGPT</option>
+              <option value="github">GitHub</option>
+              <option value="other">Diğer</option>
+            </select>
+            <small class="hint">Seçersen ikon/kategori otomatik gelir.</small>
+          </label>
+
+          <label>
+            Kategori
+            <select id="category" required>
+              <option value="">Seç</option>
+              <option>Streaming</option>
+              <option>Müzik</option>
+              <option>Oyun</option>
+              <option>Üretkenlik</option>
+              <option>Bulut</option>
+              <option>Diğer</option>
+            </select>
+          </label>
+        </div>
+
         <div class="row">
           <label>
             Ad
@@ -42,23 +73,11 @@
         </div>
 
         <div class="row">
-          <label>
-            Kategori
-            <select id="category" required>
-              <option value="">Seç</option>
-              <option>Streaming</option>
-              <option>Müzik</option>
-              <option>Oyun</option>
-              <option>Üretkenlik</option>
-              <option>Bulut</option>
-              <option>Diğer</option>
-            </select>
-          </label>
-
           <div class="actions">
             <button id="submitBtn" type="submit" class="primary">Ekle</button>
             <button id="cancelEditBtn" type="button" class="ghost hidden">Vazgeç</button>
           </div>
+          <div></div>
         </div>
 
         <input id="editId" type="hidden" />
@@ -93,10 +112,9 @@
         </div>
 
         <div class="toolbarActions">
-  <button id="exportCsvBtn">CSV Dışa Aktar</button>
-  <button id="clearAllBtn" class="danger">Hepsini Sil</button>
-</div>
-
+          <button id="exportCsvBtn">CSV Dışa Aktar</button>
+          <button id="clearAllBtn" class="danger">Hepsini Sil</button>
+        </div>
       </div>
 
       <div class="summary">
