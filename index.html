@@ -9,8 +9,14 @@
 <body>
   <main class="container">
     <header class="header">
-      <h1>Subscription Tracker</h1>
-      <p>Aylık/yıllık aboneliklerini takip et.</p>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">hwc</div>
+        <div>
+          <h1>Subscription Tracker</h1>
+          <p>Aylık/yıllık aboneliklerini takip et.</p>
+        </div>
+      </div>
+      <span class="pill">herewecoding</span>
     </header>
 
     <section class="card">
@@ -20,12 +26,12 @@
         <div class="row">
           <label>
             Ad
-            <input id="name" type="text" placeholder="Netflix" required minlength="2" />
+            <input id="name" type="text" placeholder="Netflix" required minlength="2" autocomplete="off" />
           </label>
 
           <label>
             Aylık Ücret (₺)
-            <input id="price" type="number" placeholder="199.90" required min="0" step="0.01" />
+            <input id="price" type="number" placeholder="199.90" required min="0" step="0.01" inputmode="decimal" />
           </label>
         </div>
 
@@ -44,7 +50,7 @@
           </label>
 
           <div class="actions">
-            <button id="submitBtn" type="submit">Ekle</button>
+            <button id="submitBtn" type="submit" class="primary">Ekle</button>
             <button id="cancelEditBtn" type="button" class="ghost hidden">Vazgeç</button>
           </div>
         </div>
@@ -84,11 +90,11 @@
       </div>
 
       <div class="summary">
-        <div>
+        <div class="summaryCard">
           <span>Aylık Toplam</span>
           <strong id="monthlyTotal">₺0.00</strong>
         </div>
-        <div>
+        <div class="summaryCard">
           <span>Yıllık Toplam</span>
           <strong id="yearlyTotal">₺0.00</strong>
         </div>
@@ -96,11 +102,11 @@
 
       <ul id="list" class="list"></ul>
 
-      <p id="emptyState" class="muted">Henüz abonelik yok.</p>
+      <p id="emptyState" class="muted empty">Henüz abonelik yok.</p>
     </section>
 
     <footer class="footer muted">
-      <span>herewecoding</span>
+      <span>© <span id="year"></span> herewecoding</span>
     </footer>
   </main>
 

@@ -19,6 +19,9 @@ const el = {
   clearAllBtn: document.getElementById('clearAllBtn'),
 };
 
+const yearEl = document.getElementById('year');
+if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
 function loadSubs() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -109,6 +112,9 @@ function render(subs) {
   const monthly = subs.reduce((acc, s) => acc + s.price, 0);
   el.monthlyTotal.textContent = formatTRY(monthly);
   el.yearlyTotal.textContent = formatTRY(monthly * 12);
+
+  // UX: nothing to clear => disable
+  el.clearAllBtn.disabled = subs.length === 0;
 }
 
 let subs = loadSubs();
