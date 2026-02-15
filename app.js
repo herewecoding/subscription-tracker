@@ -268,6 +268,19 @@ el.clearAllBtn.addEventListener('click', () => {
   render(subs);
   resetForm();
 });
+if (el.exportCsvBtn) {
+  el.exportCsvBtn.addEventListener('click', () => {
+    if (!subs || subs.length === 0) {
+      alert('Dışa aktarılacak veri yok.');
+      return;
+    }
+
+    const csv = exportSubscriptionsToCsv(subs);
+    const stamp = new Date().toISOString().slice(0, 10);
+    downloadCsv(`subscriptions-${stamp}.csv`, csv);
+  });
+}
+
 
 /* =========================
    CSV Export
@@ -291,28 +304,29 @@ function downloadCsv(filename, csvText) {
 }
 
 function exportSubscriptionsToCsv(subs) {
-  const header = toCsvRow(['Name', 'Category', 'ServiceKey', 'MonthlyPriceTRY', 'CreatedAt']);
-  const rows = subs.map(s =>
-    toCsvRow([
+  const header = toCsvRow([
+    'Name',
+    'Category',
+    'Service',
+    'Monthly Price (TRY)',
+    'Created Date'
+  ]);
+
+  const rows = subs.map(s => {
+    const date = new Date(s.createdAt);
+    const formattedDate = date.toLocaleString('tr-TR');
+
+    const serviceLabel = SERVICE_PRESETS[s.serviceKey]?.label || 'Other';
+
+    return toCsvRow([
       s.name,
       s.category,
-      s.serviceKey || 'other',
+      serviceLabel,
       s.price,
-      new Date(s.createdAt).toISOString(),
-    ])
-  );
+      formattedDate
+    ]);
+  });
+
   return [header, ...rows].join('\n');
 }
 
-if (el.exportCsvBtn) {
-  el.exportCsvBtn.addEventListener('click', () => {
-    if (!subs || subs.length === 0) {
-      alert('Dışa aktarılacak veri yok.');
-      return;
-    }
-
-    const csv = exportSubscriptionsToCsv(subs);
-    const stamp = new Date().toISOString().slice(0, 10);
-    downloadCsv(`subscriptions-${stamp}.csv`, csv);
-  });
-}
