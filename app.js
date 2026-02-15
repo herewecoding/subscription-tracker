@@ -1,6 +1,7 @@
 'use strict';
 
 const STORAGE_KEY = 'herewecoding_subscriptions_v1';
+const THEME_KEY = 'herewecoding_theme_v1';
 
 const el = {
   form: document.getElementById('subForm'),
@@ -17,10 +18,48 @@ const el = {
   filterCategory: document.getElementById('filterCategory'),
   sortBy: document.getElementById('sortBy'),
   clearAllBtn: document.getElementById('clearAllBtn'),
+  themeToggle: document.getElementById('themeToggle'),
 };
 
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+/* =========================
+   Theme
+   ========================= */
+
+function setTheme(theme) {
+  const t = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem(THEME_KEY, t);
+
+  if (el.themeToggle) {
+    el.themeToggle.textContent = t === 'light' ? '☀️ Light' : '🌙 Dark';
+  }
+}
+
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved === 'light' || saved === 'dark') {
+    setTheme(saved);
+    return;
+  }
+  // Default: dark (since UI is designed around it)
+  setTheme('dark');
+}
+
+initTheme();
+
+if (el.themeToggle) {
+  el.themeToggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  });
+}
+
+/* =========================
+   Subscriptions
+   ========================= */
 
 function loadSubs() {
   try {
@@ -66,6 +105,7 @@ function setEditMode(on, id = '') {
   el.editId.value = on ? id : '';
   el.submitBtn.textContent = on ? 'Güncelle' : 'Ekle';
   el.cancelEditBtn.classList.toggle('hidden', !on);
+  el.submitBtn.classList.toggle('primary', true);
 }
 
 function resetForm() {
@@ -113,7 +153,6 @@ function render(subs) {
   el.monthlyTotal.textContent = formatTRY(monthly);
   el.yearlyTotal.textContent = formatTRY(monthly * 12);
 
-  // UX: nothing to clear => disable
   el.clearAllBtn.disabled = subs.length === 0;
 }
 
