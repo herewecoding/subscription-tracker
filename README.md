@@ -17,3 +17,7 @@ https://herewecoding.github.io/subscription-tracker/
 
 ## Run Locally
 Open `index.html` in your browser.
+
+## Screenshot
+![Subscription Tracker Screenshot](screenshot.png)
+
