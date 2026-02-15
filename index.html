@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subscription Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>Subscription Tracker</h1>
+      <p>Aylık/yıllık aboneliklerini takip et.</p>
+    </header>
+
+    <section class="card">
+      <h2>Abonelik Ekle</h2>
+
+      <form id="subForm" class="form">
+        <div class="row">
+          <label>
+            Ad
+            <input id="name" type="text" placeholder="Netflix" required minlength="2" />
+          </label>
+
+          <label>
+            Aylık Ücret (₺)
+            <input id="price" type="number" placeholder="199.90" required min="0" step="0.01" />
+          </label>
+        </div>
+
+        <div class="row">
+          <label>
+            Kategori
+            <select id="category" required>
+              <option value="">Seç</option>
+              <option>Streaming</option>
+              <option>Müzik</option>
+              <option>Oyun</option>
+              <option>Üretkenlik</option>
+              <option>Bulut</option>
+              <option>Diğer</option>
+            </select>
+          </label>
+
+          <div class="actions">
+            <button id="submitBtn" type="submit">Ekle</button>
+            <button id="cancelEditBtn" type="button" class="ghost hidden">Vazgeç</button>
+          </div>
+        </div>
+
+        <input id="editId" type="hidden" />
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="toolbar">
+        <div class="filters">
+          <label>
+            Filtre
+            <select id="filterCategory">
+              <option value="ALL">Tümü</option>
+              <option>Streaming</option>
+              <option>Müzik</option>
+              <option>Oyun</option>
+              <option>Üretkenlik</option>
+              <option>Bulut</option>
+              <option>Diğer</option>
+            </select>
+          </label>
+
+          <label>
+            Sırala
+            <select id="sortBy">
+              <option value="NEWEST">En yeni</option>
+              <option value="PRICE_ASC">Ücret ↑</option>
+              <option value="PRICE_DESC">Ücret ↓</option>
+              <option value="NAME_ASC">Ad A→Z</option>
+            </select>
+          </label>
+        </div>
+
+        <button id="clearAllBtn" class="danger">Hepsini Sil</button>
+      </div>
+
+      <div class="summary">
+        <div>
+          <span>Aylık Toplam</span>
+          <strong id="monthlyTotal">₺0.00</strong>
+        </div>
+        <div>
+          <span>Yıllık Toplam</span>
+          <strong id="yearlyTotal">₺0.00</strong>
+        </div>
+      </div>
+
+      <ul id="list" class="list"></ul>
+
+      <p id="emptyState" class="muted">Henüz abonelik yok.</p>
+    </section>
+
+    <footer class="footer muted">
+      <span>herewecoding</span>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
